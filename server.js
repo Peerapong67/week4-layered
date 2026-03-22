@@ -1,0 +1,85 @@
+require('dotenv').config();
+
+const express        = require('express');
+const path           = require('path');
+const database       = require('./database/connection');
+const taskController = require('./src/controllers/taskController');
+const errorHandler   = require('./src/middleware/errorHandler');
+const { validateCreateTask, validateId } = require('./src/middleware/validator');
+const logger         = require('./src/utils/logger');
+
+const app  = express();
+const PORT = process.env.PORT || 3000;
+
+// ── Middleware ────────────────────────────────────────────────────────────────
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Logging middleware
+app.use((req, _res, next) => {
+    logger.debug(`${req.method} ${req.path}`);
+    next();
+});
+
+// ── Routes ────────────────────────────────────────────────────────────────────
+// สถิติ (ต้องอยู่ก่อน /:id เพื่อไม่ให้ "stats" ถูกแปลเป็น id)
+app.get('/api/tasks/stats',
+    taskController.getStatistics.bind(taskController));
+
+// CRUD
+app.get('/api/tasks',
+    taskController.getAllTasks.bind(taskController));
+
+app.get('/api/tasks/:id',
+    validateId,
+    taskController.getTaskById.bind(taskController));
+
+app.post('/api/tasks',
+    validateCreateTask,
+    taskController.createTask.bind(taskController));
+
+app.put('/api/tasks/:id',
+    validateId,
+    taskController.updateTask.bind(taskController));
+
+app.delete('/api/tasks/:id',
+    validateId,
+    taskController.deleteTask.bind(taskController));
+
+// Special action
+app.patch('/api/tasks/:id/next-status',
+    validateId,
+    taskController.moveToNextStatus.bind(taskController));
+
+// SPA fallback
+app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ── Global Error Handler (ต้องอยู่สุดท้ายเสมอ) ───────────────────────────────
+app.use(errorHandler);
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+async function startServer() {
+    try {
+        await database.connect();
+
+        app.listen(PORT, () => {
+            logger.info(`🚀 เซิร์ฟเวอร์ทำงานที่ http://localhost:${PORT}`);
+            logger.info(`📊 Environment : ${process.env.NODE_ENV}`);
+            logger.info(`🗄️  Database    : ${process.env.DB_PATH}`);
+        });
+    } catch (err) {
+        logger.error('ไม่สามารถเริ่มเซิร์ฟเวอร์ได้:', err.message);
+        process.exit(1);
+    }
+}
+
+process.on('SIGINT', async () => {
+    logger.info('กำลังปิดเซิร์ฟเวอร์...');
+    await database.close();
+    process.exit(0);
+});
+
+startServer();
+module.exports = app;
