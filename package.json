@@ -8,10 +8,17 @@
     "dev": "nodemon server.js",
     "test": "jest --coverage"
   },
-  "keywords": ["layered", "3-tier", "express", "sqlite", "engse207"],
+  "keywords": [
+    "layered",
+    "3-tier",
+    "express",
+    "sqlite",
+    "engse207"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.6",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "sqlite3": "^5.1.6"

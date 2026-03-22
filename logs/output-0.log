@@ -1,0 +1,4 @@
+2026-03-22T19:20:10: ✅ เชื่อมต่อฐานข้อมูลสำเร็จ: /home/pr3kubim/projects/task-board-api/database/tasks.db
+2026-03-22T19:20:10: ℹ️  [INFO]  🚀 เซิร์ฟเวอร์ทำงานที่ http://0.0.0.0:3000
+2026-03-22T19:20:10: ℹ️  [INFO]  📊 Environment : production
+2026-03-22T19:20:10: ℹ️  [INFO]  🗄️  Database    : /home/pr3kubim/projects/task-board-api/database/tasks.db
