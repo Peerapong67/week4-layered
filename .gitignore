@@ -1,8 +1,4 @@
 node_modules/
-database/*.db
-database/*.db-shm
-database/*.db-wal
+*.db
 .env
 .DS_Store
-*.log
-coverage/
